@@ -34,7 +34,6 @@ type ServiceDescriptor struct {
 				App                   string `json:"app"`
 				Cluster               string `json:"cluster"`
 				Detail                string `json:"detail"`
-				ReplicationController string `json:"replication-controller"`
 				Stack                 string `json:"stack"`
 				Version               string `json:"version"`
 			} `json:"labels"`
@@ -59,7 +58,6 @@ type ServiceDescriptor struct {
 					App                   string `json:"app"`
 					Cluster               string `json:"cluster"`
 					Detail                string `json:"detail"`
-					ReplicationController string `json:"replication-controller"`
 					Stack                 string `json:"stack"`
 					Version               string `json:"version"`
 				} `json:"matchLabels"`
@@ -74,7 +72,6 @@ type ServiceDescriptor struct {
 						App                   string `json:"app"`
 						Cluster               string `json:"cluster"`
 						Detail                string `json:"detail"`
-						ReplicationController string `json:"replication-controller"`
 						Stack                 string `json:"stack"`
 						Version               string `json:"version"`
 					} `json:"labels"`
