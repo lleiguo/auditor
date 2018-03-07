@@ -34,8 +34,6 @@ type ServiceDescriptor struct {
 				App                   string `json:"app"`
 				Cluster               string `json:"cluster"`
 				Detail                string `json:"detail"`
-				HyraxDev118604        string `json:"hyrax-dev-1-186-0-4"`
-				PodTemplateHash       string `json:"pod-template-hash"`
 				ReplicationController string `json:"replication-controller"`
 				Stack                 string `json:"stack"`
 				Version               string `json:"version"`
@@ -61,8 +59,6 @@ type ServiceDescriptor struct {
 					App                   string `json:"app"`
 					Cluster               string `json:"cluster"`
 					Detail                string `json:"detail"`
-					HyraxDev118604        string `json:"hyrax-dev-1-186-0-4"`
-					PodTemplateHash       string `json:"pod-template-hash"`
 					ReplicationController string `json:"replication-controller"`
 					Stack                 string `json:"stack"`
 					Version               string `json:"version"`
@@ -78,8 +74,6 @@ type ServiceDescriptor struct {
 						App                   string `json:"app"`
 						Cluster               string `json:"cluster"`
 						Detail                string `json:"detail"`
-						HyraxDev118604        string `json:"hyrax-dev-1-186-0-4"`
-						PodTemplateHash       string `json:"pod-template-hash"`
 						ReplicationController string `json:"replication-controller"`
 						Stack                 string `json:"stack"`
 						Version               string `json:"version"`
