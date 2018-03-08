@@ -144,7 +144,6 @@ func main() {
 		"<td style='width: 200px;'><strong>Service RS</strong></td>" +
 		"<td style='width: 57px;'><strong>Kind (Replica Set)</strong></td>" +
 		"<td style='width: 100px;'><strong>Replica Count (Dev: 3; TST: 3</strong></td>" +
-		"<td style='width: 57px;'><strong>Annotation (DeploymentKubernetesIoDesiredReplicas:3 DeploymentKubernetesIoMaxReplicas:4 )</strong></td>" +
 		"<td style='width: 300px;'><strong>Labels</strong></td>" +
 		"<td style='width: 57px;'><strong>DNS Policy (ClusterFirst)</strong></td>" +
 		"<td style='width: 57px;'><strong>Volumes (xmatters-logs)</strong></td>" +
@@ -197,12 +196,6 @@ func parseServiceDescription(serviceDescription []byte, writer *bufio.Writer, se
 				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%d' src=%s width='32' height='32'></td>", item.Spec.Replicas, checkmark))
 			} else {
 				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%d' src=%s width='32' height='32'></td>", item.Spec.Replicas, failed))
-			}
-
-			if item.Metadata.Annotations.DeploymentKubernetesIoDesiredReplicas == "3" && item.Metadata.Annotations.DeploymentKubernetesIoMaxReplicas == "4" {
-				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", fmt.Sprintf("%+v", item.Metadata.Annotations), checkmark))
-			} else {
-				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", fmt.Sprintf("%+v", item.Metadata.Annotations), failed))
 			}
 
 			labels := strings.Replace(fmt.Sprintf("%+v", item.Metadata.Labels), " ", "<BR>", -1)
