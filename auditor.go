@@ -142,7 +142,7 @@ func main() {
 	header := "<!DOCTYPE html><html><head><meta name='viewport' content='width=device-width, initial-scale=0.5'><link rel='stylesheet' href='https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css'> <script src='https://code.jquery.com/jquery-1.11.3.min.js'></script> <script src='https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js'></script> </head> <body>"
 	table := "<table style=margin: 0px auto; border='1'; align='centre'><tbody><tr align='center'>" +
 		"<td style='width: 200px;'><strong>Service RS</strong></td>" +
-		"<td style='width: 57px;'><strong>Kind (Deployment)</strong></td>" +
+		"<td style='width: 57px;'><strong>Kind (Replica Set)</strong></td>" +
 		"<td style='width: 100px;'><strong>Replica Count (Dev: 3; TST: 3</strong></td>" +
 		"<td style='width: 57px;'><strong>Annotation (DeploymentKubernetesIoDesiredReplicas:3 DeploymentKubernetesIoMaxReplicas:4 )</strong></td>" +
 		"<td style='width: 300px;'><strong>Labels</strong></td>" +
@@ -188,9 +188,9 @@ func parseServiceDescription(serviceDescription []byte, writer *bufio.Writer, se
 
 			fmt.Fprintln(writer, fmt.Sprintf("<tr align='center'><td><strong>%s</strong></td>", item.Metadata.Name))
 			if len(item.Metadata.OwnerReferences) == 1 {
-				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", item.Metadata.OwnerReferences[0].Kind, checkmark))
+				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", item.Metadata.OwnerReferences[0].Kind, failed))
 			} else {
-				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", "Replica Set", failed))
+				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", "Replica Set", checkmark))
 			}
 
 			if item.Spec.Replicas == 3 {
