@@ -5,7 +5,6 @@ import (
 	"os"
 	"fmt"
 	"strings"
-	"time"
 	"encoding/json"
 	"log"
 	"bufio"
@@ -13,53 +12,40 @@ import (
 
 var service string
 var allServices = false
-var xmServices = []string{"hyrax", "mobileapi", "reapi", "resolution", "scheduler", "soap", "voicexml", "webui", "xmapi", "multinode"}
+var xmServices = []string{"billing", "customerconfig", "dbjobsequencer", "hyrax", "mobileapi", "multinode", "reapi", "resolution", "scheduler", "soap", "voicexml", "webui", "xerus", "xmapi",}
 var checkmark = "https://www.katalon.com/wp-content/themes/katalon/template-parts/page/features/img/supported-icon.png?ver=17.11.07"
 var failed = "http://www.vetriias.com/images/Deep_Close.png"
 
 type ServiceDescriptor struct {
 	APIVersion string `json:"apiVersion"`
 	Items []struct {
-		APIVersion string `json:"apiVersion"`
-		Kind       string `json:"kind"`
+		Kind string `json:"kind"`
 		Metadata struct {
 			Annotations struct {
 				DeploymentKubernetesIoDesiredReplicas string `json:"deployment.kubernetes.io/desired-replicas"`
 				DeploymentKubernetesIoMaxReplicas     string `json:"deployment.kubernetes.io/max-replicas"`
-				DeploymentKubernetesIoRevision        string `json:"deployment.kubernetes.io/revision"`
 			} `json:"annotations"`
-			CreationTimestamp time.Time `json:"creationTimestamp"`
-			Generation        int       `json:"generation"`
 			Labels struct {
-				App                   string `json:"app"`
-				Cluster               string `json:"cluster"`
-				Detail                string `json:"detail"`
-				Stack                 string `json:"stack"`
-				Version               string `json:"version"`
+				App     string `json:"app"`
+				Cluster string `json:"cluster"`
+				Detail  string `json:"detail"`
+				Stack   string `json:"stack"`
 			} `json:"labels"`
 			Name      string `json:"name"`
 			Namespace string `json:"namespace"`
 			OwnerReferences []struct {
-				APIVersion         string `json:"apiVersion"`
-				BlockOwnerDeletion bool   `json:"blockOwnerDeletion"`
-				Controller         bool   `json:"controller"`
-				Kind               string `json:"kind"`
-				Name               string `json:"name"`
-				UID                string `json:"uid"`
+				Kind string `json:"kind"`
+				Name string `json:"name"`
 			} `json:"ownerReferences"`
-			ResourceVersion string `json:"resourceVersion"`
-			SelfLink        string `json:"selfLink"`
-			UID             string `json:"uid"`
 		} `json:"metadata"`
 		Spec struct {
 			Replicas int `json:"replicas"`
 			Selector struct {
 				MatchLabels struct {
-					App                   string `json:"app"`
-					Cluster               string `json:"cluster"`
-					Detail                string `json:"detail"`
-					Stack                 string `json:"stack"`
-					Version               string `json:"version"`
+					App     string `json:"app"`
+					Cluster string `json:"cluster"`
+					Detail  string `json:"detail"`
+					Stack   string `json:"stack"`
 				} `json:"matchLabels"`
 			} `json:"selector"`
 			Template struct {
@@ -67,13 +53,11 @@ type ServiceDescriptor struct {
 					Annotations struct {
 						PrometheusIoScrape string `json:"prometheus.io/scrape"`
 					} `json:"annotations"`
-					CreationTimestamp interface{} `json:"creationTimestamp"`
 					Labels struct {
-						App                   string `json:"app"`
-						Cluster               string `json:"cluster"`
-						Detail                string `json:"detail"`
-						Stack                 string `json:"stack"`
-						Version               string `json:"version"`
+						App     string `json:"app"`
+						Cluster string `json:"cluster"`
+						Detail  string `json:"detail"`
+						Stack   string `json:"stack"`
 					} `json:"labels"`
 				} `json:"metadata"`
 				Spec struct {
@@ -122,7 +106,6 @@ type ServiceDescriptor struct {
 						Name string `json:"name"`
 					} `json:"imagePullSecrets"`
 					RestartPolicy string `json:"restartPolicy"`
-					SchedulerName string `json:"schedulerName"`
 					SecurityContext struct {
 					} `json:"securityContext"`
 					TerminationGracePeriodSeconds int `json:"terminationGracePeriodSeconds"`
@@ -134,19 +117,8 @@ type ServiceDescriptor struct {
 				} `json:"spec"`
 			} `json:"template"`
 		} `json:"spec"`
-		Status struct {
-			AvailableReplicas    int `json:"availableReplicas"`
-			FullyLabeledReplicas int `json:"fullyLabeledReplicas"`
-			ObservedGeneration   int `json:"observedGeneration"`
-			ReadyReplicas        int `json:"readyReplicas"`
-			Replicas             int `json:"replicas"`
-		} `json:"status"`
 	} `json:"items"`
 	Kind string `json:"kind"`
-	Metadata struct {
-		ResourceVersion string `json:"resourceVersion"`
-		SelfLink        string `json:"selfLink"`
-	} `json:"metadata"`
 }
 
 func main() {
@@ -169,13 +141,13 @@ func main() {
 
 	header := "<!DOCTYPE html><html><head><meta name='viewport' content='width=device-width, initial-scale=0.5'><link rel='stylesheet' href='https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css'> <script src='https://code.jquery.com/jquery-1.11.3.min.js'></script> <script src='https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js'></script> </head> <body>"
 	table := "<table style=margin: 0px auto; border='1'; align='centre'><tbody><tr align='center'>" +
-		"<td style='width: 200px;'><strong>Service</strong></td>" +
+		"<td style='width: 200px;'><strong>Service RS</strong></td>" +
 		"<td style='width: 57px;'><strong>Kind (Deployment)</strong></td>" +
-		"<td style='width: 57px;'><strong>Replica Count (Dev: 3; TST: 3</strong></td>" +
+		"<td style='width: 100px;'><strong>Replica Count (Dev: 3; TST: 3</strong></td>" +
 		"<td style='width: 57px;'><strong>Annotation (DeploymentKubernetesIoDesiredReplicas:3 DeploymentKubernetesIoMaxReplicas:4 )</strong></td>" +
-		"<td style='width: 250px;'><strong>Labels</strong></td>" +
+		"<td style='width: 300px;'><strong>Labels</strong></td>" +
 		"<td style='width: 57px;'><strong>DNS Policy (ClusterFirst)</strong></td>" +
-		"<td style='width: 57px;'><strong>Volumes</strong></td>" +
+		"<td style='width: 57px;'><strong>Volumes (xmatters-logs)</strong></td>" +
 		"<td style='width: 57px;'><strong>Termination Grace Period (30s)</strong></td>" +
 		"<td style='width: 57px;'><strong>Splunk Forwarder</strong></td>" +
 		"<td style='width: 57px;'><strong>Consul</strong></td>" +
@@ -185,25 +157,25 @@ func main() {
 
 	if allServices {
 		for _, service := range xmServices {
-			getServiceDescription(service, writer, f)
+			getServiceDescription(service, writer)
 		}
 	} else {
-		getServiceDescription(service, writer, f)
+		getServiceDescription(service, writer)
 	}
 	footer := "</tbody></table></body></html>"
 	fmt.Fprintln(writer, footer)
 	writer.Flush()
 }
 
-func getServiceDescription(service string, writer *bufio.Writer, f *os.File ) {
+func getServiceDescription(service string, writer *bufio.Writer) {
 	cmd := exec.Command("kubectl", "get", "rs", "-o", "json", "-n", service)
 	output, err := cmd.CombinedOutput()
 	printCommand(cmd)
 	printError(err)
-	parseServiceDescription(output, writer, f, service)
+	parseServiceDescription(output, writer, service)
 }
 
-func parseServiceDescription(serviceDescription []byte, writer *bufio.Writer, f *os.File, service string) {
+func parseServiceDescription(serviceDescription []byte, writer *bufio.Writer, service string) {
 
 	var serviceDescriptor ServiceDescriptor
 	err := json.Unmarshal(serviceDescription, &serviceDescriptor)
@@ -214,16 +186,16 @@ func parseServiceDescription(serviceDescription []byte, writer *bufio.Writer, f 
 	for _, item := range serviceDescriptor.Items {
 		if !strings.Contains(item.Metadata.Name, "monitoring") {
 
-			fmt.Fprintln(writer, fmt.Sprintf("<tr align='center'><td>%s</td>", item.Metadata.Name))
+			fmt.Fprintln(writer, fmt.Sprintf("<tr align='center'><td><strong>%s</strong></td>", item.Metadata.Name))
 			if len(item.Metadata.OwnerReferences) == 1 {
 				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", item.Metadata.OwnerReferences[0].Kind, checkmark))
-			}else {
+			} else {
 				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", "Replica Set", failed))
 			}
 
 			if item.Spec.Replicas == 3 {
 				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%d' src=%s width='32' height='32'></td>", item.Spec.Replicas, checkmark))
-			}else {
+			} else {
 				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%d' src=%s width='32' height='32'></td>", item.Spec.Replicas, failed))
 			}
 
@@ -233,11 +205,14 @@ func parseServiceDescription(serviceDescription []byte, writer *bufio.Writer, f 
 				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", fmt.Sprintf("%+v", item.Metadata.Annotations), failed))
 			}
 
-			fmt.Fprintln(writer, fmt.Sprintf("<td>%+v</td>", item.Metadata.Labels))
+			labels := strings.Replace(fmt.Sprintf("%+v", item.Metadata.Labels), " ", "<BR>", -1)
+			labels = strings.Replace(labels, "{", "", -1)
+			labels = strings.Replace(labels, "}", "", -1)
+			fmt.Fprintln(writer, fmt.Sprintf("<td align=left>%s</td>", labels))
 
 			if item.Spec.Template.Spec.DNSPolicy == "ClusterFirst" {
 				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", item.Spec.Template.Spec.DNSPolicy, checkmark))
-			}else {
+			} else {
 				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", item.Spec.Template.Spec.DNSPolicy, failed))
 			}
 
@@ -256,7 +231,7 @@ func parseServiceDescription(serviceDescription []byte, writer *bufio.Writer, f 
 
 			if item.Spec.Template.Spec.TerminationGracePeriodSeconds == 30 {
 				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%d' src=%s width='32' height='32'></td>", item.Spec.Template.Spec.TerminationGracePeriodSeconds, checkmark))
-			}else {
+			} else {
 				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%d width='32' height='32'></td>", fmt.Sprintf("%+v", item.Spec.Template.Spec.TerminationGracePeriodSeconds), failed))
 			}
 
@@ -271,7 +246,7 @@ func parseServiceDescription(serviceDescription []byte, writer *bufio.Writer, f 
 				}
 			}
 			for _, container := range item.Spec.Template.Spec.Containers {
-				if container.Name == "xmatters-eng-mgmt-" +service {
+				if container.Name == "xmatters-eng-mgmt-"+service {
 					fmt.Fprintln(writer, fmt.Sprintf("<td>%+v</td>", container))
 				}
 			}
