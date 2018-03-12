@@ -17,11 +17,11 @@
       <file leaf-file-name="auditor.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/auditor.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="347">
-              <caret line="220" column="17" lean-forward="true" selection-start-line="220" selection-start-column="17" selection-end-line="220" selection-end-column="17" />
+            <state relative-caret-position="3060">
+              <caret line="254" column="80" lean-forward="false" selection-start-line="254" selection-start-column="80" selection-end-line="254" selection-end-column="80" />
               <folding>
-                <element signature="e#14#105#0" expanded="true" />
-                <element signature="e#1067#2711#0" expanded="false" />
+                <element signature="e#14#92#0" expanded="true" />
+                <element signature="e#4139#5783#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -246,12 +246,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1520385649515</updated>
-      <workItem from="1520385650947" duration="41726000" />
+      <workItem from="1520385650947" duration="45292000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="41726000" />
+    <option name="totallyTimeSpent" value="45292000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
@@ -299,7 +299,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/auditor.go</url>
-          <line>206</line>
+          <line>236</line>
           <properties />
           <option name="timeStamp" value="13" />
         </line-breakpoint>
@@ -375,11 +375,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/auditor.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="347">
-          <caret line="220" column="17" lean-forward="true" selection-start-line="220" selection-start-column="17" selection-end-line="220" selection-end-column="17" />
+        <state relative-caret-position="3060">
+          <caret line="254" column="80" lean-forward="false" selection-start-line="254" selection-start-column="80" selection-end-line="254" selection-end-column="80" />
           <folding>
-            <element signature="e#14#105#0" expanded="true" />
-            <element signature="e#1067#2711#0" expanded="false" />
+            <element signature="e#14#92#0" expanded="true" />
+            <element signature="e#4139#5783#0" expanded="false" />
           </folding>
         </state>
       </provider>

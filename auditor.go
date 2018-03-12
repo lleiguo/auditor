@@ -8,12 +8,26 @@ import (
 	"encoding/json"
 	"log"
 	"bufio"
-	//"reflect"
 )
 
 var service string
 var allServices = false
-var xmServices = []string{"billing", "customerconfig", "dbjobsequencer", "hyrax", "mobileapi", "multinode", "reapi", "resolution", "scheduler", "soap", "voicexml", "webui", "xerus", "xmapi",}
+var xmServices = map[string]XMService{"billing":billing, "customerconfig": customerconfig, "dbjobsequencer": dbjobsequencer, "hyrax": hyrax, "mobileapi": mobileapi, "multinode": multinode, "reapi": reapi, "resolution": resolution, "scheduler": scheduler, "soap": soap, "voicexml": voicexml, "webui": webui, "xerus": xerus, "xmapi": xmapi}
+var billing = XMService{Name: "billing", Spec: ""}
+var customerconfig= XMService{Name: "customerconfig", Spec: "{Name:xmatters-eng-mgmt-customerconfig Resources:{Limits:{Memory:1Gi} Requests:{Memory:512Mi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
+var dbjobsequencer = XMService{Name: "dbjobsequencer", Spec: "{Name:xmatters-eng-mgmt-dbjobsequencer Resources:{Limits:{Memory:16Gi} Requests:{Memory:12Gi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
+var hyrax = XMService{Name: "hyrax", Spec: "{Name:xmatters-eng-mgmt-hyrax Resources:{Limits:{Memory:4Gi} Requests:{Memory:}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
+var mobileapi = XMService{Name:"mobileapi", Spec: "{Name:xmatters-eng-mgmt-mobileapi Resources:{Limits:{Memory:1Gi} Requests:{Memory:1Gi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
+var multinode = XMService{Name: "multinode", Spec: "{Name:xmatters-eng-mgmt-multinode Resources:{Limits:{Memory:2560Mi} Requests:{Memory:}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
+var reapi = XMService{Name: "reapi", Spec: "{Name:xmatters-eng-mgmt-reapi Resources:{Limits:{Memory:6656Mi} Requests:{Memory:3328Mi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
+var resolution = XMService{Name: "resolution", Spec: "{Name:xmatters-eng-mgmt-resolution Resources:{Limits:{Memory:2Gi} Requests:{Memory:1Gi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
+var scheduler = XMService{Name: "scheduler", Spec: "{Name:xmatters-eng-mgmt-scheduler Resources:{Limits:{Memory:3Gi} Requests:{Memory:2Gi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
+var soap = XMService{Name: "soap", Spec: "{Name:xmatters-eng-mgmt-soap Resources:{Limits:{Memory:6656Mi} Requests:{Memory:3328Mi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
+var voicexml = XMService{Name: "voicexml", Spec: "{Name:xmatters-eng-mgmt-voicexml Resources:{Limits:{Memory:6656Mi} Requests:{Memory:3328Mi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
+var webui = XMService{Name: "webui", Spec: "{Name:xmatters-eng-mgmt-webui Resources:{Limits:{Memory:6656Mi} Requests:{Memory:3328Mi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
+var xerus = XMService{Name: "xerus", Spec: ""}
+var xmapi = XMService{Name: "xmapi", Spec: "{Name:xmatters-eng-mgmt-xmapi Resources:{Limits:{Memory:3Gi} Requests:{Memory:2Gi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
+
 var checkmark = "https://www.katalon.com/wp-content/themes/katalon/template-parts/page/features/img/supported-icon.png?ver=17.11.07"
 var failed = "http://www.vetriias.com/images/Deep_Close.png"
 
@@ -37,6 +51,21 @@ type Container struct {
 			} `json:"exec"`
 		} `json:"preStop"`
 	} `json:"lifecycle,omitempty"`
+}
+
+type XMService struct {
+	Name string
+	Spec string
+}
+
+type ServiceSpec struct {
+	Name string
+	RequestCPU string
+	RequestMEM string
+	LimitCPU string
+	LimitMEM string
+	RunAsNonRoot bool
+	PreStopExecCmd string
 }
 
 type ReplicaSet struct {
@@ -95,6 +124,7 @@ var splunkForwarder = "{Name:xmatters-eng-mgmt-xmsplunkforwarder Resources:{Limi
 
 var consul = "{Name:xmatters-eng-mgmt-xmconsul Resources:{Limits:{Memory:256Mi} Requests:{Memory:128Mi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"
 
+
 func main() {
 
 	if len(os.Args) > 2 || len(os.Args) < 2 {
@@ -130,7 +160,7 @@ func main() {
 
 	if allServices {
 		for _, service := range xmServices {
-			getServiceDescription(service, writer)
+			getServiceDescription(service.Name, writer)
 		}
 	} else {
 		getServiceDescription(service, writer)
@@ -222,7 +252,11 @@ func parseServiceDescription(serviceDescription []byte, writer *bufio.Writer, se
 			}
 			for _, container := range item.Spec.Template.Spec.Containers {
 				if container.Name == "xmatters-eng-mgmt-"+service {
-					fmt.Fprintln(writer, fmt.Sprintf("<td>%+v</td>", container))
+					if fmt.Sprintf("%+v", container) == xmServices[service].Spec {
+						fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%+v' src=%s width='32' height='32'></td>", fmt.Sprintf("%+v", container), checkmark))
+					} else {
+						fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%+v' src=%s width='32' height='32'></td>", fmt.Sprintf("%+v", container), failed))
+					}
 				}
 			}
 		}
