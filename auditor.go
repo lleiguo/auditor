@@ -12,22 +12,7 @@ import (
 
 var service string
 var allServices = false
-var xmServices = map[string]XMService{"billing":billing, "customerconfig": customerconfig, "dbjobsequencer": dbjobsequencer, "hyrax": hyrax, "mobileapi": mobileapi, "multinode": multinode, "reapi": reapi, "resolution": resolution, "scheduler": scheduler, "soap": soap, "voicexml": voicexml, "webui": webui, "xerus": xerus, "xmapi": xmapi}
-var billing = XMService{Name: "billing", Spec: ""}
-var customerconfig= XMService{Name: "customerconfig", Spec: "{Name:xmatters-eng-mgmt-customerconfig Resources:{Limits:{Memory:1Gi} Requests:{Memory:512Mi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
-var dbjobsequencer = XMService{Name: "dbjobsequencer", Spec: "{Name:xmatters-eng-mgmt-dbjobsequencer Resources:{Limits:{Memory:16Gi} Requests:{Memory:12Gi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
-var hyrax = XMService{Name: "hyrax", Spec: "{Name:xmatters-eng-mgmt-hyrax Resources:{Limits:{Memory:4Gi} Requests:{Memory:}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
-var mobileapi = XMService{Name:"mobileapi", Spec: "{Name:xmatters-eng-mgmt-mobileapi Resources:{Limits:{Memory:1Gi} Requests:{Memory:1Gi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
-var multinode = XMService{Name: "multinode", Spec: "{Name:xmatters-eng-mgmt-multinode Resources:{Limits:{Memory:2560Mi} Requests:{Memory:}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
-var reapi = XMService{Name: "reapi", Spec: "{Name:xmatters-eng-mgmt-reapi Resources:{Limits:{Memory:6656Mi} Requests:{Memory:3328Mi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
-var resolution = XMService{Name: "resolution", Spec: "{Name:xmatters-eng-mgmt-resolution Resources:{Limits:{Memory:2Gi} Requests:{Memory:1Gi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
-var scheduler = XMService{Name: "scheduler", Spec: "{Name:xmatters-eng-mgmt-scheduler Resources:{Limits:{Memory:3Gi} Requests:{Memory:2Gi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
-var soap = XMService{Name: "soap", Spec: "{Name:xmatters-eng-mgmt-soap Resources:{Limits:{Memory:6656Mi} Requests:{Memory:3328Mi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
-var voicexml = XMService{Name: "voicexml", Spec: "{Name:xmatters-eng-mgmt-voicexml Resources:{Limits:{Memory:6656Mi} Requests:{Memory:3328Mi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
-var webui = XMService{Name: "webui", Spec: "{Name:xmatters-eng-mgmt-webui Resources:{Limits:{Memory:6656Mi} Requests:{Memory:3328Mi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
-var xerus = XMService{Name: "xerus", Spec: ""}
-var xmapi = XMService{Name: "xmapi", Spec: "{Name:xmatters-eng-mgmt-xmapi Resources:{Limits:{Memory:3Gi} Requests:{Memory:2Gi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"}
-
+var xmServices = []string{"billing", "customerconfig", "dbjobsequencer", "hyrax", "mobileapi", "multinode", "reapi", "resolution", "scheduler", "soap", "voicexml", "webui", "xerus", "xmapi"}
 var checkmark = "https://www.katalon.com/wp-content/themes/katalon/template-parts/page/features/img/supported-icon.png?ver=17.11.07"
 var failed = "http://www.vetriias.com/images/Deep_Close.png"
 
@@ -35,9 +20,11 @@ type Container struct {
 	Name string `json:"name"`
 	Resources struct {
 		Limits struct {
+			CPU    string `json:"cpu"`
 			Memory string `json:"memory"`
 		} `json:"limits"`
 		Requests struct {
+			CPU    string `json:"cpu"`
 			Memory string `json:"memory"`
 		} `json:"requests"`
 	} `json:"resources"`
@@ -53,19 +40,43 @@ type Container struct {
 	} `json:"lifecycle,omitempty"`
 }
 
-type XMService struct {
-	Name string
-	Spec string
-}
-
-type ServiceSpec struct {
-	Name string
-	RequestCPU string
-	RequestMEM string
-	LimitCPU string
-	LimitMEM string
-	RunAsNonRoot bool
-	PreStopExecCmd string
+func (container Container) audit() bool {
+	commonSettings := len(container.Resources.Limits.Memory) > 0 && len(container.Resources.Requests.Memory) > 0 && container.SecurityContext.RunAsNonRoot == false && len(container.Lifecycle.PreStop.Exec.Command) == 0
+	switch container.Name {
+	case "xmatters-eng-mgmt-xmsplunkforwarder":
+		return commonSettings && container.Resources.Limits.Memory == "512Mi" && container.Resources.Requests.Memory == "256Mi"
+	case "xmatters-eng-mgmt-xmconsul":
+		return commonSettings && container.Resources.Limits.Memory == "256Mi" && container.Resources.Requests.Memory == "128Mi"
+	case "xmatters-eng-mgmt-billing":
+		return commonSettings && container.Resources.Limits.Memory == "" && container.Resources.Requests.Memory == ""
+	case "xmatters-eng-mgmt-customerconfig":
+		return commonSettings && container.Resources.Limits.Memory == "1Gi" && container.Resources.Requests.Memory == "512Mi"
+	case "xmatters-eng-mgmt-dbjobsequencer":
+		return commonSettings && container.Resources.Limits.Memory == "16Gi" && container.Resources.Requests.Memory == "12Gi"
+	case "xmatters-eng-mgmt-hyrax":
+		return commonSettings && container.Resources.Limits.Memory == "4Gi" && container.Resources.Requests.Memory == "2Gi"
+	case "xmatters-eng-mgmt-mobileapi":
+		return commonSettings && container.Resources.Limits.Memory == "1Gi" && container.Resources.Requests.Memory == "1Gi"
+	case "xmatters-eng-mgmt-multinode":
+		return commonSettings && container.Resources.Limits.Memory == "2Gi" && container.Resources.Requests.Memory == "2Gi"
+	case "xmatters-eng-mgmt-reapi":
+		return commonSettings && container.Resources.Limits.Memory == "6656Mi" && container.Resources.Requests.Memory == "3328Mi"
+	case "xmatters-eng-mgmt-resolution":
+		return commonSettings && container.Resources.Limits.Memory == "2Gi" && container.Resources.Requests.Memory == "1Gi"
+	case "xmatters-eng-mgmt-scheduler":
+		return commonSettings && container.Resources.Limits.Memory == "3Gi" && container.Resources.Requests.Memory == "2Gi"
+	case "xmatters-eng-mgmt-soap":
+		return commonSettings && container.Resources.Limits.Memory == "6656Mi" && container.Resources.Requests.Memory == "3328Mi"
+	case "xmatters-eng-mgmt-voicexml":
+		return commonSettings && container.Resources.Limits.Memory == "6656Mi" && container.Resources.Requests.Memory == "3328Mi"
+	case "xmatters-eng-mgmt-webui":
+		return commonSettings && container.Resources.Limits.Memory == "6656Mi" && container.Resources.Requests.Memory == "3328Mi"
+	case "xmatters-eng-mgmt-xerus":
+		return commonSettings && container.Resources.Limits.Memory == "" && container.Resources.Requests.Memory == ""
+	case "xmatters-eng-mgmt-xmapi":
+		return commonSettings && container.Resources.Limits.Memory == "3Gi" && container.Resources.Requests.Memory == "2Gi"
+	}
+	return false
 }
 
 type ReplicaSet struct {
@@ -120,11 +131,6 @@ type ReplicaSet struct {
 	Kind string `json:"kind"`
 }
 
-var splunkForwarder = "{Name:xmatters-eng-mgmt-xmsplunkforwarder Resources:{Limits:{Memory:512Mi} Requests:{Memory:256Mi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"
-
-var consul = "{Name:xmatters-eng-mgmt-xmconsul Resources:{Limits:{Memory:256Mi} Requests:{Memory:128Mi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"
-
-
 func main() {
 
 	if len(os.Args) > 2 || len(os.Args) < 2 {
@@ -160,7 +166,7 @@ func main() {
 
 	if allServices {
 		for _, service := range xmServices {
-			getServiceDescription(service.Name, writer)
+			getServiceDescription(service, writer)
 		}
 	} else {
 		getServiceDescription(service, writer)
@@ -190,28 +196,21 @@ func parseServiceDescription(serviceDescription []byte, writer *bufio.Writer, se
 		if !strings.Contains(item.Metadata.Name, "monitoring") {
 
 			fmt.Fprintln(writer, fmt.Sprintf("<tr align='center'><td><strong>%s</strong></td>", item.Metadata.Name))
-			if len(item.Metadata.OwnerReferences) == 1 {
-				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", item.Metadata.OwnerReferences[0].Kind, failed))
-			} else {
-				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", "Replica Set", checkmark))
-			}
 
-			if item.Spec.Replicas == 3 {
-				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%d' src=%s width='32' height='32'></td>", item.Spec.Replicas, checkmark))
-			} else {
-				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%d' src=%s width='32' height='32'></td>", item.Spec.Replicas, failed))
+			kind := "Replica Set"
+			if len(item.Metadata.OwnerReferences) > 0 {
+				kind = item.Metadata.OwnerReferences[0].Kind
 			}
+			writeTD(len(item.Metadata.OwnerReferences) == 0, writer, kind)
+
+			writeTD(item.Spec.Replicas == 3, writer, string(item.Spec.Replicas))
 
 			labels := strings.Replace(fmt.Sprintf("%+v", item.Metadata.Labels), " ", "<BR>", -1)
 			labels = strings.Replace(labels, "{", "", -1)
 			labels = strings.Replace(labels, "}", "", -1)
 			fmt.Fprintln(writer, fmt.Sprintf("<td align=left>%s</td>", labels))
 
-			if item.Spec.Template.Spec.DNSPolicy == "ClusterFirst" {
-				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", item.Spec.Template.Spec.DNSPolicy, checkmark))
-			} else {
-				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", item.Spec.Template.Spec.DNSPolicy, failed))
-			}
+			writeTD(item.Spec.Template.Spec.DNSPolicy == "ClusterFirst", writer, fmt.Sprintf("%+v", item.Spec.Template.Spec.DNSPolicy))
 
 			var xmLogsVolumeExists = false
 			for _, volume := range item.Spec.Template.Spec.Volumes {
@@ -220,48 +219,38 @@ func parseServiceDescription(serviceDescription []byte, writer *bufio.Writer, se
 				}
 			}
 
-			if xmLogsVolumeExists {
-				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='xmatters-logs volume exist' src=%s width='32' height='32'></td>", checkmark))
-			} else {
-				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", fmt.Sprintf("%+v", item.Spec.Template.Spec.Volumes), failed))
-			}
+			writeTD(xmLogsVolumeExists, writer, fmt.Sprintf("%+v", item.Spec.Template.Spec.Volumes))
 
-			if item.Spec.Template.Spec.TerminationGracePeriodSeconds == 30 {
-				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%d' src=%s width='32' height='32'></td>", item.Spec.Template.Spec.TerminationGracePeriodSeconds, checkmark))
-			} else {
-				fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%d width='32' height='32'></td>", fmt.Sprintf("%+v", item.Spec.Template.Spec.TerminationGracePeriodSeconds), failed))
-			}
+			writeTD(item.Spec.Template.Spec.TerminationGracePeriodSeconds == 30, writer, string(item.Spec.Template.Spec.TerminationGracePeriodSeconds))
+
+			var splunkContainer, consulContainer, serviceContainer Container
 
 			for _, container := range item.Spec.Template.Spec.Containers {
-				if container.Name == "xmatters-eng-mgmt-xmsplunkforwarder" {
-					if fmt.Sprintf("%+v", container) == splunkForwarder {
-						fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%+v' src=%s width='32' height='32'></td>", fmt.Sprintf("%+v", container), checkmark))
-					} else {
-						fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%+v' src=%s width='32' height='32'></td>", fmt.Sprintf("%+v", container), failed))
+				switch container.Name {
+				case "xmatters-eng-mgmt-xmsplunkforwarder":
+					splunkContainer = container
+				case "xmatters-eng-mgmt-xmconsul":
+					consulContainer = container
+				default:
+					if container.Name == "xmatters-eng-mgmt-"+service {
+						serviceContainer = container
 					}
 				}
 			}
-			for _, container := range item.Spec.Template.Spec.Containers {
-				if container.Name == "xmatters-eng-mgmt-xmconsul" {
-					if fmt.Sprintf("%+v", container) == consul {
-						fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%+v' src=%s width='32' height='32'></td>", fmt.Sprintf("%+v", container), checkmark))
-					} else {
-						fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%+v' src=%s width='32' height='32'></td>", fmt.Sprintf("%+v", container), failed))
-					}
-				}
-			}
-			for _, container := range item.Spec.Template.Spec.Containers {
-				if container.Name == "xmatters-eng-mgmt-"+service {
-					if fmt.Sprintf("%+v", container) == xmServices[service].Spec {
-						fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%+v' src=%s width='32' height='32'></td>", fmt.Sprintf("%+v", container), checkmark))
-					} else {
-						fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%+v' src=%s width='32' height='32'></td>", fmt.Sprintf("%+v", container), failed))
-					}
-				}
-			}
+			writeTD(splunkContainer.audit(), writer, fmt.Sprintf("%+v", splunkContainer))
+			writeTD(consulContainer.audit(), writer, fmt.Sprintf("%+v", consulContainer))
+			writeTD(serviceContainer.audit(), writer, fmt.Sprintf("%+v", serviceContainer))
+			fmt.Fprintln(writer, fmt.Sprintf("</tr>"))
+			writer.Flush()
 		}
-		fmt.Fprintln(writer, fmt.Sprintf("</tr>"))
-		writer.Flush()
+	}
+}
+
+func writeTD(pass bool, writer *bufio.Writer, title string) {
+	if pass {
+		fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", title, checkmark))
+	} else {
+		fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", title, failed))
 	}
 
 }
