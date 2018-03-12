@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"log"
 	"bufio"
+	//"reflect"
 )
 
 var service string
@@ -16,8 +17,29 @@ var xmServices = []string{"billing", "customerconfig", "dbjobsequencer", "hyrax"
 var checkmark = "https://www.katalon.com/wp-content/themes/katalon/template-parts/page/features/img/supported-icon.png?ver=17.11.07"
 var failed = "http://www.vetriias.com/images/Deep_Close.png"
 
-type ServiceDescriptor struct {
-	APIVersion string `json:"apiVersion"`
+type Container struct {
+	Name string `json:"name"`
+	Resources struct {
+		Limits struct {
+			Memory string `json:"memory"`
+		} `json:"limits"`
+		Requests struct {
+			Memory string `json:"memory"`
+		} `json:"requests"`
+	} `json:"resources"`
+	SecurityContext struct {
+		RunAsNonRoot bool `json:"runAsNonRoot"`
+	} `json:"securityContext,omitempty"`
+	Lifecycle struct {
+		PreStop struct {
+			Exec struct {
+				Command []string `json:"command"`
+			} `json:"exec"`
+		} `json:"preStop"`
+	} `json:"lifecycle,omitempty"`
+}
+
+type ReplicaSet struct {
 	Items []struct {
 		Kind string `json:"kind"`
 		Metadata struct {
@@ -40,14 +62,6 @@ type ServiceDescriptor struct {
 		} `json:"metadata"`
 		Spec struct {
 			Replicas int `json:"replicas"`
-			Selector struct {
-				MatchLabels struct {
-					App     string `json:"app"`
-					Cluster string `json:"cluster"`
-					Detail  string `json:"detail"`
-					Stack   string `json:"stack"`
-				} `json:"matchLabels"`
-			} `json:"selector"`
 			Template struct {
 				Metadata struct {
 					Annotations struct {
@@ -61,54 +75,10 @@ type ServiceDescriptor struct {
 					} `json:"labels"`
 				} `json:"metadata"`
 				Spec struct {
-					Containers []struct {
-						Env []struct {
-							Name  string `json:"name"`
-							Value string `json:"value"`
-						} `json:"env"`
-						Image           string `json:"image"`
-						ImagePullPolicy string `json:"imagePullPolicy"`
-						Name            string `json:"name"`
-						Ports []struct {
-							ContainerPort int    `json:"containerPort"`
-							Name          string `json:"name"`
-							Protocol      string `json:"protocol"`
-						} `json:"ports"`
-						Resources struct {
-							Limits struct {
-								Memory string `json:"memory"`
-							} `json:"limits"`
-							Requests struct {
-								Memory string `json:"memory"`
-							} `json:"requests"`
-						} `json:"resources"`
-						SecurityContext struct {
-							RunAsNonRoot bool `json:"runAsNonRoot"`
-						} `json:"securityContext,omitempty"`
-						TerminationMessagePath   string `json:"terminationMessagePath"`
-						TerminationMessagePolicy string `json:"terminationMessagePolicy"`
-						VolumeMounts []struct {
-							MountPath string `json:"mountPath"`
-							Name      string `json:"name"`
-							ReadOnly  bool   `json:"readOnly"`
-						} `json:"volumeMounts,omitempty"`
-						Args []string `json:"args,omitempty"`
-						Lifecycle struct {
-							PreStop struct {
-								Exec struct {
-									Command []string `json:"command"`
-								} `json:"exec"`
-							} `json:"preStop"`
-						} `json:"lifecycle,omitempty"`
-					} `json:"containers"`
-					DNSPolicy string `json:"dnsPolicy"`
-					ImagePullSecrets []struct {
-						Name string `json:"name"`
-					} `json:"imagePullSecrets"`
-					RestartPolicy string `json:"restartPolicy"`
-					SecurityContext struct {
-					} `json:"securityContext"`
-					TerminationGracePeriodSeconds int `json:"terminationGracePeriodSeconds"`
+					Containers                    []Container
+					DNSPolicy                     string `json:"dnsPolicy"`
+					RestartPolicy                 string `json:"restartPolicy"`
+					TerminationGracePeriodSeconds int    `json:"terminationGracePeriodSeconds"`
 					Volumes []struct {
 						EmptyDir struct {
 						} `json:"emptyDir"`
@@ -120,6 +90,10 @@ type ServiceDescriptor struct {
 	} `json:"items"`
 	Kind string `json:"kind"`
 }
+
+var splunkForwarder = "{Name:xmatters-eng-mgmt-xmsplunkforwarder Resources:{Limits:{Memory:512Mi} Requests:{Memory:256Mi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"
+
+var consul = "{Name:xmatters-eng-mgmt-xmconsul Resources:{Limits:{Memory:256Mi} Requests:{Memory:128Mi}} SecurityContext:{RunAsNonRoot:false} Lifecycle:{PreStop:{Exec:{Command:[]}}}}"
 
 func main() {
 
@@ -176,7 +150,7 @@ func getServiceDescription(service string, writer *bufio.Writer) {
 
 func parseServiceDescription(serviceDescription []byte, writer *bufio.Writer, service string) {
 
-	var serviceDescriptor ServiceDescriptor
+	var serviceDescriptor ReplicaSet
 	err := json.Unmarshal(serviceDescription, &serviceDescriptor)
 	if err != nil {
 		log.Fatalf("error: %v", err)
@@ -230,12 +204,20 @@ func parseServiceDescription(serviceDescription []byte, writer *bufio.Writer, se
 
 			for _, container := range item.Spec.Template.Spec.Containers {
 				if container.Name == "xmatters-eng-mgmt-xmsplunkforwarder" {
-					fmt.Fprintln(writer, fmt.Sprintf("<td>%+v</td>", container))
+					if fmt.Sprintf("%+v", container) == splunkForwarder {
+						fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%+v' src=%s width='32' height='32'></td>", fmt.Sprintf("%+v", container), checkmark))
+					} else {
+						fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%+v' src=%s width='32' height='32'></td>", fmt.Sprintf("%+v", container), failed))
+					}
 				}
 			}
 			for _, container := range item.Spec.Template.Spec.Containers {
 				if container.Name == "xmatters-eng-mgmt-xmconsul" {
-					fmt.Fprintln(writer, fmt.Sprintf("<td>%+v</td>", container))
+					if fmt.Sprintf("%+v", container) == consul {
+						fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%+v' src=%s width='32' height='32'></td>", fmt.Sprintf("%+v", container), checkmark))
+					} else {
+						fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%+v' src=%s width='32' height='32'></td>", fmt.Sprintf("%+v", container), failed))
+					}
 				}
 			}
 			for _, container := range item.Spec.Template.Spec.Containers {
