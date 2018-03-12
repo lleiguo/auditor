@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"log"
 	"bufio"
+	"strconv"
 )
 
 var service string
@@ -203,7 +204,7 @@ func parseServiceDescription(serviceDescription []byte, writer *bufio.Writer, se
 			}
 			writeTD(len(item.Metadata.OwnerReferences) == 0, writer, kind)
 
-			writeTD(item.Spec.Replicas == 3, writer, string(item.Spec.Replicas))
+			writeTD(item.Spec.Replicas == 3, writer, strconv.Itoa(item.Spec.Replicas))
 
 			labels := strings.Replace(fmt.Sprintf("%+v", item.Metadata.Labels), " ", "<BR>", -1)
 			labels = strings.Replace(labels, "{", "", -1)
@@ -221,7 +222,7 @@ func parseServiceDescription(serviceDescription []byte, writer *bufio.Writer, se
 
 			writeTD(xmLogsVolumeExists, writer, fmt.Sprintf("%+v", item.Spec.Template.Spec.Volumes))
 
-			writeTD(item.Spec.Template.Spec.TerminationGracePeriodSeconds == 30, writer, string(item.Spec.Template.Spec.TerminationGracePeriodSeconds))
+			writeTD(item.Spec.Template.Spec.TerminationGracePeriodSeconds == 30, writer, strconv.Itoa(item.Spec.Template.Spec.TerminationGracePeriodSeconds))
 
 			var splunkContainer, consulContainer, serviceContainer Container
 

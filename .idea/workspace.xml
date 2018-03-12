@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="12b40f09-7732-4422-91f0-7c82adb15132" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/auditor.go" afterPath="$PROJECT_DIR$/auditor.go" />
-      <change beforePath="$PROJECT_DIR$/service_configuration.html" afterPath="$PROJECT_DIR$/service_configuration.html" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -17,11 +16,11 @@
       <file leaf-file-name="auditor.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/auditor.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2718">
-              <caret line="201" column="21" lean-forward="false" selection-start-line="201" selection-start-column="21" selection-end-line="201" selection-end-column="21" />
+            <state relative-caret-position="275">
+              <caret line="195" column="11" lean-forward="false" selection-start-line="195" selection-start-column="11" selection-end-line="195" selection-end-column="11" />
               <folding>
-                <element signature="e#14#92#0" expanded="true" />
-                <element signature="e#3909#5553#0" expanded="false" />
+                <element signature="e#14#103#0" expanded="true" />
+                <element signature="e#3920#5564#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -247,12 +246,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1520385649515</updated>
-      <workItem from="1520385650947" duration="53870000" />
+      <workItem from="1520385650947" duration="54076000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="53870000" />
+    <option name="totallyTimeSpent" value="54076000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="2560" height="1440" extended-state="0" />
@@ -300,15 +299,9 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/auditor.go</url>
-          <line>43</line>
+          <line>44</line>
           <properties />
           <option name="timeStamp" value="14" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/auditor.go</url>
-          <line>203</line>
-          <properties />
-          <option name="timeStamp" value="15" />
         </line-breakpoint>
       </breakpoints>
       <option name="time" value="16" />
@@ -382,11 +375,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/auditor.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2718">
-          <caret line="201" column="21" lean-forward="false" selection-start-line="201" selection-start-column="21" selection-end-line="201" selection-end-column="21" />
+        <state relative-caret-position="275">
+          <caret line="195" column="11" lean-forward="false" selection-start-line="195" selection-start-column="11" selection-end-line="195" selection-end-column="11" />
           <folding>
-            <element signature="e#14#92#0" expanded="true" />
-            <element signature="e#3909#5553#0" expanded="false" />
+            <element signature="e#14#103#0" expanded="true" />
+            <element signature="e#3920#5564#0" expanded="false" />
           </folding>
         </state>
       </provider>
