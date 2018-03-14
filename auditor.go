@@ -14,7 +14,7 @@ import (
 var service string
 var allServices = false
 var xmServices = []string{"billing", "customerconfig", "dbjobsequencer", "hyrax", "mobileapi", "multinode", "reapi", "resolution", "scheduler", "soap", "voicexml", "webui", "xerus", "xmapi"}
-var checkmark = "https://www.katalon.com/wp-content/themes/katalon/template-parts/page/features/img/supported-icon.png?ver=17.11.07"
+var passed = "https://www.katalon.com/wp-content/themes/katalon/template-parts/page/features/img/supported-icon.png?ver=17.11.07"
 var failed = "http://www.vetriias.com/images/Deep_Close.png"
 
 type Container struct {
@@ -39,6 +39,16 @@ type Container struct {
 			} `json:"exec"`
 		} `json:"preStop"`
 	} `json:"lifecycle,omitempty"`
+}
+
+type Service struct {
+	Items []struct {
+		Spec struct {
+			ClusterIP       string `json:"clusterIP"`
+			SessionAffinity string `json:"sessionAffinity"`
+			Type            string `json:"type"`
+		} `json:"spec"`
+	} `json:"items"`
 }
 
 func (container Container) audit() bool {
@@ -78,6 +88,13 @@ func (container Container) audit() bool {
 		return commonSettings && container.Resources.Limits.Memory == "3Gi" && container.Resources.Requests.Memory == "2Gi"
 	}
 	return false
+}
+
+func (service Service) audit() (bool, string) {
+	if len(service.Items) > 0 {
+		return service.Items[0].Spec.Type == "ClusterIP", service.Items[0].Spec.Type
+	}
+	return false, "No Load Balance Found"
 }
 
 type ReplicaSet struct {
@@ -154,6 +171,7 @@ func main() {
 	table := "<table style=margin: 0px auto; border='1'; align='centre'><tbody><tr align='center'>" +
 		"<td style='width: 200px;'><strong>Service RS</strong></td>" +
 		"<td style='width: 57px;'><strong>Kind (Replica Set)</strong></td>" +
+		"<td style='width: 57px;'><strong>Load Balancer (ClusterIP)</strong></td>" +
 		"<td style='width: 100px;'><strong>Replica Count (Dev: 3; TST: 3</strong></td>" +
 		"<td style='width: 300px;'><strong>Labels</strong></td>" +
 		"<td style='width: 57px;'><strong>DNS Policy (ClusterFirst)</strong></td>" +
@@ -179,19 +197,33 @@ func main() {
 
 func getServiceDescription(service string, writer *bufio.Writer) {
 	cmd := exec.Command("kubectl", "get", "rs", "-o", "json", "-n", service)
-	output, err := cmd.CombinedOutput()
+	rs, err := cmd.CombinedOutput()
 	printCommand(cmd)
 	printError(err)
-	parseServiceDescription(output, writer, service)
+
+	cmd = exec.Command("kubectl", "get", "service", "-o", "json", "-n", service)
+	svc, err := cmd.CombinedOutput()
+	printCommand(cmd)
+	printError(err)
+
+	parseServiceDescription(rs, svc, writer, service)
 }
 
-func parseServiceDescription(serviceDescription []byte, writer *bufio.Writer, service string) {
+func parseServiceDescription(rs []byte, svc []byte, writer *bufio.Writer, service string) {
 
 	var serviceDescriptor ReplicaSet
-	err := json.Unmarshal(serviceDescription, &serviceDescriptor)
+	err := json.Unmarshal(rs, &serviceDescriptor)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
+
+	var k8sService Service
+	err = json.Unmarshal(svc, &k8sService)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+
+	lb, lbType := k8sService.audit()
 
 	for _, item := range serviceDescriptor.Items {
 		if !strings.Contains(item.Metadata.Name, "monitoring") {
@@ -203,6 +235,7 @@ func parseServiceDescription(serviceDescription []byte, writer *bufio.Writer, se
 				kind = item.Metadata.OwnerReferences[0].Kind
 			}
 			writeTD(len(item.Metadata.OwnerReferences) == 0, writer, kind)
+			writeTD(lb, writer, lbType)
 
 			writeTD(item.Spec.Replicas == 3, writer, strconv.Itoa(item.Spec.Replicas))
 
@@ -249,7 +282,7 @@ func parseServiceDescription(serviceDescription []byte, writer *bufio.Writer, se
 
 func writeTD(pass bool, writer *bufio.Writer, title string) {
 	if pass {
-		fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", title, checkmark))
+		fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", title, passed))
 	} else {
 		fmt.Fprintln(writer, fmt.Sprintf("<td><img border='0' title='%s' src=%s width='32' height='32'></td>", title, failed))
 	}
@@ -283,7 +316,7 @@ func isError(err error) bool {
 		fmt.Println(err.Error())
 	}
 
-	return (err != nil)
+	return err != nil
 }
 
 func printError(err error) {
