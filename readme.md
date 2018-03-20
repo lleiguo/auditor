@@ -6,17 +6,17 @@ Verify the service deployed into GCP is compliant with the service deployment st
 Build it
 
 ```
-go build auditor.go
+go build src/com/xmatters/auditor/auditor.go
 ```
 
 Run against all service namespaces
 
 ```
-./auditor -a
+./bin/auditor -a
 ```
 
 Run against one service namespace e.g. xmapi
 
 ```
-./auditor xmapi
+./bin/auditor xmapi
 ```

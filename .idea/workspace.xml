@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="12b40f09-7732-4422-91f0-7c82adb15132" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/auditor.go" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/service_configuration.html" afterPath="$PROJECT_DIR$/service_configuration.html" />
-      <change beforePath="$PROJECT_DIR$/src/com/xmatters/auditor/auditor.go" afterPath="$PROJECT_DIR$/src/com/xmatters/auditor/auditor.go" />
+      <change beforePath="$PROJECT_DIR$/readme.md" afterPath="$PROJECT_DIR$/readme.md" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -42,8 +38,8 @@
       <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="4" column="7" lean-forward="false" selection-start-line="4" selection-start-column="7" selection-end-line="4" selection-end-column="7" />
+            <state relative-caret-position="45">
+              <caret line="3" column="7" lean-forward="false" selection-start-line="3" selection-start-column="7" selection-end-line="3" selection-end-column="7" />
               <folding />
             </state>
           </provider>
@@ -59,7 +55,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="container.go" pinned="false" current-in-tab="true">
+      <file leaf-file-name="container.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/xmatters/k8s/container.go">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="143">
@@ -71,12 +67,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="readme.md" pinned="false" current-in-tab="false">
+      <file leaf-file-name="readme.md" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/readme.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="315">
-                <caret line="21" column="3" lean-forward="false" selection-start-line="21" selection-start-column="3" selection-end-line="21" selection-end-column="3" />
+              <first_editor relative-caret-position="210">
+                <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="16" />
                 <folding />
               </first_editor>
               <second_editor />
@@ -129,7 +125,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/readme.md" />
         <option value="$PROJECT_DIR$/struct/rs.go" />
         <option value="$PROJECT_DIR$/structs/rs.go" />
         <option value="$PROJECT_DIR$/auditor.go" />
@@ -143,6 +138,7 @@
         <option value="$PROJECT_DIR$/src/com/xmatters/k8s/service.go" />
         <option value="$PROJECT_DIR$/src/com/xmatters/auditor/auditor.go" />
         <option value="$PROJECT_DIR$/src/com/xmatters/k8s/container.go" />
+        <option value="$PROJECT_DIR$/readme.md" />
       </list>
     </option>
   </component>
@@ -379,12 +375,12 @@
       <workItem from="1520385650947" duration="58059000" />
       <workItem from="1520970832743" duration="7766000" />
       <workItem from="1521233450944" duration="311000" />
-      <workItem from="1521271061421" duration="23319000" />
+      <workItem from="1521271061421" duration="23418000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="89455000" />
+    <option name="totallyTimeSpent" value="89554000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
@@ -521,21 +517,10 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/json.txt" />
-    <entry file="file://$PROJECT_DIR$/readme.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="315">
-            <caret line="21" column="3" lean-forward="false" selection-start-line="21" selection-start-column="3" selection-end-line="21" selection-end-column="3" />
-            <folding />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="7" lean-forward="false" selection-start-line="4" selection-start-column="7" selection-end-line="4" selection-end-column="7" />
+        <state relative-caret-position="45">
+          <caret line="3" column="7" lean-forward="false" selection-start-line="3" selection-start-column="7" selection-end-line="3" selection-end-column="7" />
           <folding />
         </state>
       </provider>
@@ -573,6 +558,17 @@
           <folding>
             <element signature="e#13#29#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/readme.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="210">
+            <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="16" />
+            <folding />
+          </first_editor>
+          <second_editor />
         </state>
       </provider>
     </entry>
