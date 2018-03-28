@@ -6,6 +6,8 @@ type Container struct {
 	Spec ContainerSpec
 }
 
+var commonSettings = true
+
 func (container Container) Audit() (bool, string) {
 	if container.Spec.ImagePullPolicy != "IfNotPresent" {
 		return false, "ImagePullPolicy is not set to `IfNotPresent`"
@@ -22,7 +24,7 @@ func (container Container) Audit() (bool, string) {
 	if len(container.Spec.Lifecycle.PreStop.Exec.Command) > 0 {
 		return false, "Container using PreStop hooks"
 	}
-	return false, "Unknown reason"
+	return true, "Non-compliant CPU/MEM settings"
 }
 
 type ContainerSpec struct {
@@ -133,34 +135,32 @@ func (consul Consul) Audit() (bool, string) {
 func (xmService XMService) Audit() (bool, string) {
 	commonSettings, reason := xmService.Container.Audit()
 	switch xmService.Container.Spec.Name {
-	case "xmatters-eng-mgmt-billing":
-		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "" && xmService.Container.Spec.Resources.Requests.Memory == "", reason
 	case "xmatters-eng-mgmt-customerconfig":
-		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "1Gi" && xmService.Container.Spec.Resources.Requests.Memory == "512Mi", "CPU/MEM Setting"
+		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "1024Mi" && xmService.Container.Spec.Resources.Requests.Memory == "512Mi", reason
 	case "xmatters-eng-mgmt-dbjobsequencer":
-		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "16Gi" && xmService.Container.Spec.Resources.Requests.Memory == "12Gi", "CPU/MEM Setting"
+		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "16384Mi" && xmService.Container.Spec.Resources.Requests.Memory == "12288Mi", reason
 	case "xmatters-eng-mgmt-hyrax":
-		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "4Gi" && xmService.Container.Spec.Resources.Requests.Memory == "2Gi", "CPU/MEM Setting"
+		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "4096Mi" && xmService.Container.Spec.Resources.Requests.Memory == "2048Mi", reason
 	case "xmatters-eng-mgmt-mobileapi":
-		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "1Gi" && xmService.Container.Spec.Resources.Requests.Memory == "1Gi", "CPU/MEM Setting"
+		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "1024Mi" && xmService.Container.Spec.Resources.Requests.Memory == "1024Mi", reason
 	case "xmatters-eng-mgmt-multinode":
-		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "2Gi" && xmService.Container.Spec.Resources.Requests.Memory == "2Gi", "CPU/MEM Setting"
+		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "4096Mi" && xmService.Container.Spec.Resources.Requests.Memory == "4096Mi", reason
 	case "xmatters-eng-mgmt-reapi":
-		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "6656Mi" && xmService.Container.Spec.Resources.Requests.Memory == "3328Mi", "CPU/MEM Setting"
+		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "6656Mi" && xmService.Container.Spec.Resources.Requests.Memory == "3328Mi", reason
 	case "xmatters-eng-mgmt-resolution":
-		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "2Gi" && xmService.Container.Spec.Resources.Requests.Memory == "1Gi", "CPU/MEM Setting"
+		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "2048Mi" && xmService.Container.Spec.Resources.Requests.Memory == "1024M", reason
 	case "xmatters-eng-mgmt-scheduler":
-		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "3Gi" && xmService.Container.Spec.Resources.Requests.Memory == "2Gi", "CPU/MEM Setting"
+		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "3072Mi" && xmService.Container.Spec.Resources.Requests.Memory == "2048Mi", reason
 	case "xmatters-eng-mgmt-soap":
-		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "6656Mi" && xmService.Container.Spec.Resources.Requests.Memory == "3328Mi", "CPU/MEM Setting"
+		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "6656Mi" && xmService.Container.Spec.Resources.Requests.Memory == "3328Mi", reason
 	case "xmatters-eng-mgmt-voicexml":
-		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "6656Mi" && xmService.Container.Spec.Resources.Requests.Memory == "3328Mi", "CPU/MEM Setting"
+		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "6656Mi" && xmService.Container.Spec.Resources.Requests.Memory == "3328Mi", reason
 	case "xmatters-eng-mgmt-webui":
-		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "6656Mi" && xmService.Container.Spec.Resources.Requests.Memory == "3328Mi", "CPU/MEM Setting"
+		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "6656Mi" && xmService.Container.Spec.Resources.Requests.Memory == "3328Mi", reason
 	case "xmatters-eng-mgmt-xerus":
-		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "" && xmService.Container.Spec.Resources.Requests.Memory == "", "CPU/MEM Setting"
+		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "2048Mi" && xmService.Container.Spec.Resources.Requests.Memory == "1024Mi", reason
 	case "xmatters-eng-mgmt-xmapi":
-		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "3Gi" && xmService.Container.Spec.Resources.Requests.Memory == "2Gi", "CPU/MEM Setting"
+		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "4096Mi" && xmService.Container.Spec.Resources.Requests.Memory == "3072Mi", reason
 	}
 	return false, "Unknown reason"
 

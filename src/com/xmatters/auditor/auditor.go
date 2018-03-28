@@ -1,4 +1,4 @@
-package auditor
+package main
 
 import (
 	"os/exec"
@@ -14,16 +14,26 @@ import (
 
 var service string
 var allServices = false
-var xmServices = []string{"billing", "customerconfig", "dbjobsequencer", "hyrax", "mobileapi", "multinode", "reapi", "resolution", "scheduler", "soap", "voicexml", "webui", "xerus", "xmapi"}
+var xmServices = []string{"customerconfig", "dbjobsequencer", "hyrax", "mobileapi", "multinode", "reapi", "resolution", "scheduler", "soap", "voicexml", "webui", "xerus", "xmapi"}
 var passed = "https://www.katalon.com/wp-content/themes/katalon/template-parts/page/features/img/supported-icon.png?ver=17.11.07"
 var failed = "http://www.vetriias.com/images/Deep_Close.png"
+var region = "dev"
 
 func main() {
 
-	if len(os.Args) > 2 || len(os.Args) < 2 {
-		fmt.Fprintf(os.Stderr, "Too many arguments, auditor takes one [service] or [-a || -all], e.g. 'auditor xmapi' or 'auditor -a', actual arguments %d \n", len(os.Args))
+	if len(os.Args) > 4 || len(os.Args) < 2 {
+		fmt.Fprintf(os.Stderr, "Too many arguments, auditor takes one [service] or [-a || -all] and/or [-r || -region] , e.g. 'auditor xmapi' or 'auditor -a' or 'auditor -a -r active, actual arguments %d \n", len(os.Args))
 		os.Exit(1)
-	} else if len(os.Args) == 2 {
+	} else if len(os.Args) == 4 {
+		if os.Args[1] == "-a" || os.Args[1] == "-all" {
+			allServices = true
+		} else {
+			service = os.Args[1]
+		}
+		if os.Args[2] == "-r" || os.Args[2] == "-region" {
+			region = os.Args[3]
+		}
+	}else if len(os.Args) == 2 {
 		if os.Args[1] == "-a" || os.Args[1] == "-all" {
 			allServices = true
 		} else {
@@ -32,16 +42,16 @@ func main() {
 	}
 
 	createFile()
-	f, _ := os.OpenFile("./service_configuration.html", os.O_APPEND|os.O_RDWR, 0644)
+	f, _ := os.OpenFile("./" + region + "_service_configuration.html", os.O_APPEND|os.O_RDWR, 0644)
 	writer := bufio.NewWriter(f)
 	defer f.Close()
 
 	header := "<!DOCTYPE html><html><head><meta name='viewport' content='width=device-width, initial-scale=0.5'><link rel='stylesheet' href='https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css'> <script src='https://code.jquery.com/jquery-1.11.3.min.js'></script> <script src='https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js'></script> </head> <body>"
-	table := "<table style=margin: 0px auto; border='1'; align='centre'><tbody><tr align='center'>" +
+	table := "<table style=margin: 0px auto; border='1'; align='centre'><tbody><tr align='center'><td colspan=11><strong>%s</strong></td></tr><tr align='center'>" +
 		"<td style='width: 200px;'><strong>Service RS</strong></td>" +
 		"<td style='width: 57px;'><strong>Kind (Replica Set)</strong></td>" +
 		"<td style='width: 57px;'><strong>Load Balancer (ClusterIP)</strong></td>" +
-		"<td style='width: 100px;'><strong>Replica Count (Dev: 3; TST: 3</strong></td>" +
+		"<td style='width: 100px;'><strong>Replica Count (Dev/Passive: 1; TST: 3</strong></td>" +
 		"<td style='width: 300px;'><strong>Labels</strong></td>" +
 		"<td style='width: 57px;'><strong>DNS Policy (ClusterFirst)</strong></td>" +
 		"<td style='width: 57px;'><strong>Volumes (xmatters-logs)</strong></td>" +
@@ -49,7 +59,7 @@ func main() {
 		"<td style='width: 57px;'><strong>Splunk Forwarder</strong></td>" +
 		"<td style='width: 57px;'><strong>Consul</strong></td>" +
 		"<td style='width: 57px;'><strong>Service Container</strong></td></tr>"
-	fmt.Fprintln(writer, header, table)
+	fmt.Fprintln(writer, header, fmt.Sprintf(table, region))
 	writer.Flush()
 
 	if allServices {
@@ -106,7 +116,12 @@ func parseServiceDescription(rs []byte, svc []byte, writer *bufio.Writer, servic
 			writeTD(len(item.Metadata.OwnerReferences) == 0, writer, kind)
 			writeTD(lb, writer, lbType)
 
-			writeTD(item.Spec.Replicas == 3, writer, strconv.Itoa(item.Spec.Replicas))
+			var replica = 1
+			if region == "active" {
+				//If passive or dev, replica will be 1
+				replica = 3
+			}
+			writeTD(item.Spec.Replicas == replica, writer, strconv.Itoa(item.Spec.Replicas))
 
 			labels := strings.Replace(fmt.Sprintf("%+v", item.Metadata.Labels), " ", "<BR>", -1)
 			labels = strings.Replace(labels, "{", "", -1)
@@ -165,7 +180,7 @@ func writeTD(pass bool, writer *bufio.Writer, title string) {
 
 func createFile() {
 	// detect if file exists
-	fullPath := "./service_configuration.html"
+	fullPath := "./" + region + "_service_configuration.html"
 	var _, err = os.Stat(fullPath)
 
 	// create file if not exists

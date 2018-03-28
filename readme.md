@@ -3,16 +3,22 @@
 Verify the service deployed into GCP is compliant with the service deployment standard we hve
 ## Getting Started
 
-Build it
+Run against all service namespaces in dev (default)
 
 ```
-go build src/com/xmatters/auditor/auditor.go
+go run ./src/com/xmatters/auditor/auditor.go -a
 ```
 
-Run against all service namespaces
+Run against all service namespaces in active region
 
 ```
-./bin/auditor -a
+go run ./src/com/xmatters/auditor/auditor.go -a -r active
+```
+
+Run against all service namespaces in passive region
+
+```
+go run ./src/com/xmatters/auditor/auditor.go -a -r passive
 ```
 
 Run against one service namespace e.g. xmapi
