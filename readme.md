@@ -1,6 +1,6 @@
 # K8S Auditor
 
-Verify the service deployed into GCP is compliant with the service deployment standard we hve
+Verify the service deployed into GCP is compliant with the service deployment standard we have
 ## Getting Started
 
 Run against all service namespaces in dev (default)
