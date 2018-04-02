@@ -59,7 +59,7 @@ func main() {
 		"<td style='width: 57px;'><strong>Splunk Forwarder</strong></td>" +
 		"<td style='width: 57px;'><strong>Consul</strong></td>" +
 		"<td style='width: 57px;'><strong>Service Container</strong></td></tr>"
-	fmt.Fprintln(writer, header, fmt.Sprintf(table, region))
+	fmt.Fprintln(writer, header, table)
 	writer.Flush()
 
 	if allServices {
