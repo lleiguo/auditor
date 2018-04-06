@@ -1,7 +1,5 @@
 package k8s
 
-import "strings"
-
 type Container struct {
 	Spec ContainerSpec
 }
@@ -9,12 +7,12 @@ type Container struct {
 var commonSettings = true
 
 func (container Container) Audit() (bool, string) {
-	if container.Spec.ImagePullPolicy != "IfNotPresent" {
-		return false, "ImagePullPolicy is not set to `IfNotPresent`"
-	}
-	if strings.Contains(container.Spec.Image, "latest") {
-		return false, "Image using latest tag"
-	}
+	//if container.Spec.ImagePullPolicy != "IfNotPresent" {
+	//	return false, "ImagePullPolicy is not set to `IfNotPresent`"
+	//}
+	//if strings.Contains(container.Spec.Image, "latest") {
+	//	return false, "Image using latest tag"
+	//}
 	if len(container.Spec.Resources.Limits.Memory) == 0 && len(container.Spec.Resources.Requests.Memory) == 0 {
 		return false, "Missing memory setting"
 	}
@@ -24,6 +22,12 @@ func (container Container) Audit() (bool, string) {
 	if len(container.Spec.Lifecycle.PreStop.Exec.Command) > 0 {
 		return false, "Container using PreStop hooks"
 	}
+	//if container.Spec.LivenessProbe.FailureThreshold == 0 {
+	//	return false, "Container missing liveness check"
+	//}
+	//if container.Spec.ReadinessProbe.FailureThreshold == 0 {
+	//	return false, "Container missing readiness check"
+	//}
 	return true, "Non-compliant CPU/MEM settings"
 }
 
@@ -46,6 +50,12 @@ type ContainerSpec struct {
 			Memory string `json:"memory"`
 		} `json:"requests"`
 	} `json:"resources"`
+	LivenessProbe struct {
+		FailureThreshold int `json:"failureThreshold"`
+	} `json:"livenessprobe"`
+	ReadinessProbe struct {
+		FailureThreshold int `json:"failureThreshold"`
+	}`json:"readinessprobe"`
 	SecurityContext struct {
 		RunAsNonRoot bool `json:"runAsNonRoot"`
 	} `json:"securityContext,omitempty"`
@@ -142,9 +152,9 @@ func (xmService XMService) Audit() (bool, string) {
 	case "xmatters-eng-mgmt-hyrax":
 		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "4096Mi" && xmService.Container.Spec.Resources.Requests.Memory == "2048Mi", reason
 	case "xmatters-eng-mgmt-mobileapi":
-		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "1024Mi" && xmService.Container.Spec.Resources.Requests.Memory == "1024Mi", reason
+		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "2048Mi" && xmService.Container.Spec.Resources.Requests.Memory == "2048Mi", reason
 	case "xmatters-eng-mgmt-multinode":
-		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "4096Mi" && xmService.Container.Spec.Resources.Requests.Memory == "4096Mi", reason
+		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "4Gi" && xmService.Container.Spec.Resources.Requests.Memory == "4Gi", reason
 	case "xmatters-eng-mgmt-reapi":
 		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "6656Mi" && xmService.Container.Spec.Resources.Requests.Memory == "3328Mi", reason
 	case "xmatters-eng-mgmt-resolution":
@@ -163,5 +173,4 @@ func (xmService XMService) Audit() (bool, string) {
 		return commonSettings && xmService.Container.Spec.Resources.Limits.Memory == "4096Mi" && xmService.Container.Spec.Resources.Requests.Memory == "3072Mi", reason
 	}
 	return false, "Unknown reason"
-
 }
