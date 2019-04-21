@@ -3,3 +3,6 @@
 ./.gitignore
 ./bin/*
 ./*service_configuration.html
+*/pkg/
+./src/com/hs/auditor/auditor
+./src/com/hs/auditor/*_service_configuration.html
