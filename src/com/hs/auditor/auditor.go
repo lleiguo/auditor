@@ -51,10 +51,10 @@ func main() {
 
 	header := "<!DOCTYPE html><html><head><meta charset='utf-8'>" +
 		"<link rel='stylesheet' href='https://www.w3schools.com/w3css/4/w3.css'>" +
-		"<link rel='stylesheet' href='https://raw.githubusercontent.com/lleiguo/auditor/master/src/com/hs/auditor/table.css'>" +
+		"<link rel='stylesheet' href='https://drive.google.com/file/d/1mBEmEi62alaPkWpEIvQD5Chks2zcQzvf/view?usp=sharing'>" +
 		"<script src='https://www.kryogenix.org/code/browser/sorttable/sorttable.js'></script>" +
 		"</head> <body class='w3-container'>"
-	table := "<table id='myTable' class='sortable w3-table-all'><tr>" +
+	table := "<table id='myTable' class='sortable w3-table-all' style='background-color:#eee; color:#666666;cursor: default;'><tr>" +
 		"<th><strong>Deployed Service</strong></th>" +
 		"<th><strong>Description</strong></th>" +
 		"<th><strong>Team</strong></th>" +

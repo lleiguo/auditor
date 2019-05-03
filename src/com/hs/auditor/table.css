@@ -1,5 +1,5 @@
 /* Sortable tables */
-table.sortable thead {
+table.sortable {
   background-color:#eee;
   color:#666666;
   font-weight: bold;
