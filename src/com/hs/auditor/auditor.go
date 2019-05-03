@@ -12,58 +12,62 @@ import (
 	"strings"
 )
 
-var service string
-var allServices = true
+var namespace = "default"
+var allNamespaces = true
 var passed = "https://www.katalon.com/wp-content/themes/katalon/template-parts/page/features/img/supported-icon.png?ver=17.11.07"
 var failed = "http://www.vetriias.com/images/Deep_Close.png"
-var region = "dev"
 
 func main() {
 
-	if len(os.Args) > 4 || len(os.Args) < 2 {
-		fmt.Fprintf(os.Stderr, "Too many arguments, auditor takes one [service] or [-a || -all] and/or [-r || -region] , e.g. 'auditor xmapi' or 'auditor -a' or 'auditor -a -r active, actual arguments %d \n", len(os.Args))
+	if len(os.Args) > 4 {
+		fmt.Fprintf(os.Stderr, "Too many arguments, auditor takes one namespace or [-a || -all] for all namespaces , e.g. 'auditor' or 'auditor -n default' or 'auditor -a , actual arguments %d \n", len(os.Args))
 		os.Exit(1)
 	} else if len(os.Args) == 4 {
 		if os.Args[1] == "-a" || os.Args[1] == "-all" {
-			allServices = true
-		} else {
-			service = os.Args[1]
+			allNamespaces = true
+			namespace = "--all-namespaces"
+		} else if os.Args[1] == "-n" {
+			namespace = os.Args[1]
 		}
-		if os.Args[2] == "-r" || os.Args[2] == "-region" {
-			region = os.Args[3]
+		if os.Args[2] == "-n" {
+			namespace = os.Args[2]
+		} else if os.Args[2] == "-a" || os.Args[2] == "-all" {
+			allNamespaces = true
+			namespace = "--all-namespaces"
 		}
 	} else if len(os.Args) == 2 {
 		if os.Args[1] == "-a" || os.Args[1] == "-all" {
-			allServices = true
-		} else {
-			service = os.Args[1]
+			allNamespaces = true
+			namespace = "--all-namespaces"
+		} else if os.Args[1] == "-n" {
+			namespace = os.Args[1]
 		}
 	}
 
 	createFile()
-	f, _ := os.OpenFile("./"+region+"_service_configuration.html", os.O_APPEND|os.O_RDWR, 0644)
+	f, _ := os.OpenFile("./"+namespace+"_service_configuration.html", os.O_APPEND|os.O_RDWR, 0644)
 	writer := bufio.NewWriter(f)
 	defer f.Close()
 
-	header := "<!DOCTYPE html><html><head><meta name='viewport' content='width=device-width, initial-scale=0.5'><link rel='stylesheet' href='https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css'> <script src='https://code.jquery.com/jquery-1.11.3.min.js'></script> <script src='https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js'></script> </head> <body>"
-	table := "<table style=margin: 0px auto; border='1'; align='centre'><tbody><tr align='center'><td colspan=11><strong>%s</strong></td></tr><tr align='center'>" +
-		"<td style='width: 200px;'><strong>Deployed Service</strong></td>" +
-		"<td style='width: 200px;'><strong>Description</strong></td>" +
-		"<td style='width: 57px;'><strong>Team</strong></td>" +
-		"<td style='width: 57px;'><strong>GitHub</strong></td>" +
-		"<td style='width: 100px;'><strong>Maintainer(s)</strong></td>" +
-		"<td style='width: 100px;'><strong>Pager Team</strong></td>" +
-		"<td style='width: 300px;'><strong>Sensu Checks</strong></td>" +
-		"<td style='width: 300px;'><strong>Skeleton Type</strong></td>" +
-		"<td style='width: 57px;'><strong>Slack</strong></td>" +
-		"<td style='width: 57px;'><strong>Service Type</strong></td>" +
-		"<td style='width: 57px;'><strong>Labels</strong></td>" +
-		"<td style='width: 57px;'><strong>Replica</strong></td>" +
-		"<td style='width: 57px;'><strong>Sumologic</strong></td>" +
-		"<td style='width: 57px;'><strong>Resource Limits</strong></td>" +
-		"<td style='width: 57px;'><strong>Resource Requests</strong></td>" +
-		"<td style='width: 57px;'><strong>Liveness</strong></td>" +
-		"<td style='width: 57px;'><strong>Readiness</strong></td></tr>"
+	header := "<!DOCTYPE html><html><head><meta name='viewport' content='width=device-width, initial-scale=0.5'><link rel='stylesheet' href='https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css'> <script src='https://code.jquery.com/jquery-1.11.3.min.js'></script><script src='https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js'></script><script src='https://www.kryogenix.org/code/browser/sorttable/sorttable.js'></script> </head> <body>"
+	table := "<table class='sortable table table-bordered'; data-resizable-columns-id='demo-table-v2'><thread><tbody><tr align='center'>" +
+		"<th data-resizable-column-id='service'><strong>Deployed Service</strong></th>" +
+		"<th data-resizable-column-id='description'><strong>Description</strong></th>" +
+		"<th data-resizable-column-id='team'><strong>Team</strong></th>" +
+		"<th data-resizable-column-id='pager team'><strong>Pager Team</strong></th>" +
+		"<th data-resizable-column-id='skeleton'><strong>Skeleton Type</strong></th>" +
+		"<th data-resizable-column-id='slack'><strong>Slack</strong></th>" +
+		"<th data-resizable-column-id='github'><strong>GitHub</strong></th>" +
+		"<th data-resizable-column-id='maintainer'><strong>Maintainer(s)</strong></th>" +
+		"<th data-resizable-column-id='sensu'><strong>Sensu Checks</strong></th>" +
+		"<th data-resizable-column-id='service type'><strong>Service Type</strong></th>" +
+		"<th data-resizable-column-id='labels'><strong>Labels</strong></th>" +
+		"<th data-resizable-column-id='replica'><strong>Replica</strong></th>" +
+		"<th data-resizable-column-id='sumologic'><strong>Sumologic</strong></th>" +
+		"<th data-resizable-column-id='resource limits'><strong>Resource Limits</strong></th>" +
+		"<th data-resizable-column-id='resource requests'><strong>Resource Requests</strong></th>" +
+		"<th data-resizable-column-id='liveness'><strong>Liveness</strong></th>" +
+		"<th data-resizable-column-id='readiness'><strong>Readiness</strong></th></tr></thread>"
 	fmt.Fprintln(writer, header, table)
 	writer.Flush()
 
@@ -107,16 +111,14 @@ func parseServiceDescription(deploy []byte, svc []byte, writer *bufio.Writer, se
 		if !strings.Contains(item.Metadata.Name, "monitoring") {
 
 			fmt.Fprintln(writer, fmt.Sprintf("<tr align='center'><td><strong>%s</strong></td>", item.Metadata.Name))
-
 			fmt.Fprintln(writer, fmt.Sprintf("<td align=left>%s</td>", item.Metadata.Annotations.HootsuiteComDescription))
 			fmt.Fprintln(writer, fmt.Sprintf("<td align=left>%s</td>", item.Metadata.Annotations.HootsuiteComTeam))
-			fmt.Fprintln(writer, fmt.Sprintf("<td align=left>%s</td>", item.Metadata.Annotations.HootsuiteComGithub))
-			fmt.Fprintln(writer, fmt.Sprintf("<td align=left>%s</td>", item.Metadata.Annotations.HootsuiteComMaintainers))
 			fmt.Fprintln(writer, fmt.Sprintf("<td align=left>%s</td>", item.Metadata.Annotations.HootsuiteComPagerTeam))
-			fmt.Fprintln(writer, fmt.Sprintf("<td align=left>%s</td>", item.Metadata.Annotations.HootsuiteComSensuChecks))
 			fmt.Fprintln(writer, fmt.Sprintf("<td align=left>%s</td>", item.Metadata.Annotations.HootsuiteComSkeletonType))
-			fmt.Fprintln(writer, fmt.Sprintf("<td align=left>%s</td>", item.Metadata.Annotations.HootsuiteComSlackChannel))
-
+			fmt.Fprintln(writer, fmt.Sprintf("<td align=left><a href=https://hootsuite.slack.com/messages/%s>%s</a></td>", item.Metadata.Annotations.HootsuiteComSlackChannel, item.Metadata.Annotations.HootsuiteComSlackChannel))
+			fmt.Fprintln(writer, fmt.Sprintf("<td align=left><a href=%s>%s</a></td>", item.Metadata.Annotations.HootsuiteComGithub, item.Metadata.Annotations.HootsuiteComGithub))
+			fmt.Fprintln(writer, fmt.Sprintf("<td align=left>%s</td>", item.Metadata.Annotations.HootsuiteComMaintainers))
+			fmt.Fprintln(writer, fmt.Sprintf("<td align=left>%s</td>", item.Metadata.Annotations.HootsuiteComSensuChecks))
 			fmt.Fprintln(writer, fmt.Sprintf("<td align=left>%s</td>", item.Spec.Selector.MatchLabels.ServiceType))
 
 			labels := strings.Replace(fmt.Sprintf("%+v", item.Metadata.Labels), " ", "<BR>", -1)
@@ -157,7 +159,7 @@ func writeTD(pass bool, writer *bufio.Writer, title string) {
 
 func createFile() {
 	// detect if file exists
-	fullPath := "./" + region + "_service_configuration.html"
+	fullPath := "./" + namespace + "_service_configuration.html"
 	var _, err = os.Stat(fullPath)
 
 	// create file if not exists
