@@ -49,7 +49,7 @@ func main() {
 	writer := bufio.NewWriter(f)
 	defer f.Close()
 
-	header := "<!DOCTYPE html><html><head><meta name='viewport' content='width=device-width, initial-scale=0.5'><link rel='stylesheet' href='https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css'> <script src='https://code.jquery.com/jquery-1.11.3.min.js'></script><script src='https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js'></script><script src='https://www.kryogenix.org/code/browser/sorttable/sorttable.js'></script> </head> <body>"
+	header := "<!DOCTYPE html><html><head><meta name='viewport' content='width=device-width, initial-scale=0.5'><link rel='stylesheet' href='https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css'><link rel='stylesheet' href='https://raw.githubusercontent.com/lleiguo/auditor/master/src/com/hs/auditor/table.css'> <script src='https://code.jquery.com/jquery-1.11.3.min.js'></script><script src='https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js'></script><script src='https://www.kryogenix.org/code/browser/sorttable/sorttable.js'></script><script src='./table.js'></script> </head> <body>"
 	table := "<table class='sortable table table-bordered'; data-resizable-columns-id='demo-table-v2'><thread><tbody><tr align='center'>" +
 		"<th data-resizable-column-id='service'><strong>Deployed Service</strong></th>" +
 		"<th data-resizable-column-id='description'><strong>Description</strong></th>" +
