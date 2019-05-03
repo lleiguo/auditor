@@ -49,30 +49,34 @@ func main() {
 	writer := bufio.NewWriter(f)
 	defer f.Close()
 
-	header := "<!DOCTYPE html><html><head><meta name='viewport' content='width=device-width, initial-scale=0.5'><link rel='stylesheet' href='https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css'><link rel='stylesheet' href='https://raw.githubusercontent.com/lleiguo/auditor/master/src/com/hs/auditor/table.css'> <script src='https://code.jquery.com/jquery-1.11.3.min.js'></script><script src='https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js'></script><script src='https://www.kryogenix.org/code/browser/sorttable/sorttable.js'></script><script src='./table.js'></script> </head> <body>"
-	table := "<table class='sortable table table-bordered'; data-resizable-columns-id='demo-table-v2'><thread><tbody><tr align='center'>" +
-		"<th data-resizable-column-id='service'><strong>Deployed Service</strong></th>" +
-		"<th data-resizable-column-id='description'><strong>Description</strong></th>" +
-		"<th data-resizable-column-id='team'><strong>Team</strong></th>" +
-		"<th data-resizable-column-id='pager team'><strong>Pager Team</strong></th>" +
-		"<th data-resizable-column-id='skeleton'><strong>Skeleton Type</strong></th>" +
-		"<th data-resizable-column-id='slack'><strong>Slack</strong></th>" +
-		"<th data-resizable-column-id='github'><strong>GitHub</strong></th>" +
-		"<th data-resizable-column-id='maintainer'><strong>Maintainer(s)</strong></th>" +
-		"<th data-resizable-column-id='sensu'><strong>Sensu Checks</strong></th>" +
-		"<th data-resizable-column-id='service type'><strong>Service Type</strong></th>" +
-		"<th data-resizable-column-id='labels'><strong>Labels</strong></th>" +
-		"<th data-resizable-column-id='replica'><strong>Replica</strong></th>" +
-		"<th data-resizable-column-id='sumologic'><strong>Sumologic</strong></th>" +
-		"<th data-resizable-column-id='resource limits'><strong>Resource Limits</strong></th>" +
-		"<th data-resizable-column-id='resource requests'><strong>Resource Requests</strong></th>" +
-		"<th data-resizable-column-id='liveness'><strong>Liveness</strong></th>" +
-		"<th data-resizable-column-id='readiness'><strong>Readiness</strong></th></tr></thread>"
+	header := "<!DOCTYPE html><html><head><meta charset='utf-8'>" +
+		"<link rel='stylesheet' href='https://www.w3schools.com/w3css/4/w3.css'>" +
+		"<link rel='stylesheet' href='https://raw.githubusercontent.com/lleiguo/auditor/master/src/com/hs/auditor/table.css'>" +
+		"<script src='https://www.kryogenix.org/code/browser/sorttable/sorttable.js'></script>" +
+		"</head> <body class='w3-container'>"
+	table := "<table id='myTable' class='sortable w3-table-all'><tr>" +
+		"<th><strong>Deployed Service</strong></th>" +
+		"<th><strong>Description</strong></th>" +
+		"<th><strong>Team</strong></th>" +
+		"<th><strong>Pager Team</strong></th>" +
+		"<th><strong>Skeleton Type</strong></th>" +
+		"<th><strong>Slack</strong></th>" +
+		"<th><strong>GitHub</strong></th>" +
+		"<th><strong>Maintainer(s)</strong></th>" +
+		"<th><strong>Sensu Checks</strong></th>" +
+		"<th><strong>Service Type</strong></th>" +
+		"<th><strong>Labels</strong></th>" +
+		"<th><strong>Replica</strong></th>" +
+		"<th><strong>Sumologic</strong></th>" +
+		"<th><strong>Resource Limits</strong></th>" +
+		"<th><strong>Resource Requests</strong></th>" +
+		"<th><strong>Liveness</strong></th>" +
+		"<th><strong>Readiness</strong></th></tr>"
 	fmt.Fprintln(writer, header, table)
 	writer.Flush()
 
 	getServiceDescription("default", writer)
-	footer := "</tbody></table></body></html>"
+	footer := "</table></body></html>"
 	fmt.Fprintln(writer, footer)
 	writer.Flush()
 }
@@ -110,7 +114,7 @@ func parseServiceDescription(deploy []byte, svc []byte, writer *bufio.Writer, se
 	for _, item := range serviceDescriptor.Items {
 		if !strings.Contains(item.Metadata.Name, "monitoring") {
 
-			fmt.Fprintln(writer, fmt.Sprintf("<tr align='center'><td><strong>%s</strong></td>", item.Metadata.Name))
+			fmt.Fprintln(writer, fmt.Sprintf("<tr class='item' align='center'><td><strong>%s</strong></td>", item.Metadata.Name))
 			fmt.Fprintln(writer, fmt.Sprintf("<td align=left>%s</td>", item.Metadata.Annotations.HootsuiteComDescription))
 			fmt.Fprintln(writer, fmt.Sprintf("<td align=left>%s</td>", item.Metadata.Annotations.HootsuiteComTeam))
 			fmt.Fprintln(writer, fmt.Sprintf("<td align=left>%s</td>", item.Metadata.Annotations.HootsuiteComPagerTeam))
@@ -142,7 +146,7 @@ func parseServiceDescription(deploy []byte, svc []byte, writer *bufio.Writer, se
 			// var reason string
 			// result, reason = serviceContainer.Audit()
 			// writeTD(result, writer, fmt.Sprintf("%s - [%+v]", reason, serviceContainer))
-			// fmt.Fprintln(writer, fmt.Sprintf("</tr>"))
+			fmt.Fprintln(writer, fmt.Sprintf("</tr>"))
 			writer.Flush()
 		}
 	}

@@ -1,11 +1,7 @@
-table{
-    table-layout: fixed;
-    td, th{
-      overflow: hidden;
-      white-space: nowrap;
-      -moz-text-overflow: ellipsis;        
-         -ms-text-overflow: ellipsis;
-          -o-text-overflow: ellipsis;
-             text-overflow: ellipsis;
-    }
-  }
+/* Sortable tables */
+table.sortable thead {
+  background-color:#eee;
+  color:#666666;
+  font-weight: bold;
+  cursor: default;
+}
